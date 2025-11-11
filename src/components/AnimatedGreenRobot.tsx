@@ -1,191 +1,152 @@
-import { motion } from 'framer-motion';
+'use client'
 
-interface AnimatedGreenRobotProps {
-  size?: number;
-  color?: string;
-  animationSpeed?: number;
+import { motion } from 'framer-motion'
+import { Badge } from '@/components/ui/badge'
+import DashboardCard from '@/components/dashboard/card'
+import type { SecurityStatus as SecurityStatusType } from '@/types/dashboard'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
+import { Bullet } from '@/components/ui/bullet'
+
+// Variant styling for status cards
+const securityStatusItemVariants = cva('border rounded-md ring-4', {
+  variants: {
+    variant: {
+      success: 'border-success bg-success/5 text-success ring-success/3',
+      warning: 'border-warning bg-warning/5 text-warning ring-warning/3',
+      destructive: 'border-destructive bg-destructive/5 text-destructive ring-destructive/3',
+    },
+  },
+  defaultVariants: {
+    variant: 'success',
+  },
+})
+
+interface SecurityStatusItemProps extends VariantProps<typeof securityStatusItemVariants> {
+  title: string
+  value: string
+  status: string
+  className?: string
 }
 
-export default function AnimatedGreenRobot({
-  size = 1000,
-  color = '#00FF00',
-  animationSpeed = 2
-}: AnimatedGreenRobotProps) {
-  const scale = size / 1000;
+function SecurityStatusItem({ title, value, status, variant, className }: SecurityStatusItemProps) {
+  return (
+    <div className={cn(securityStatusItemVariants({ variant }), className)}>
+      <div className="flex items-center gap-2 py-1 px-2 border-b border-current">
+        <Bullet size="sm" variant={variant} />
+        <span className="text-sm font-medium">{title}</span>
+      </div>
+      <div className="py-1 px-2.5">
+        <div className="text-2xl font-bold mb-1">{value}</div>
+        <div className="text-xs opacity-50">{status}</div>
+      </div>
+    </div>
+  )
+}
 
+// === Animated SVG Robot (replaces GIF) ===
+interface AnimatedCuteRobotProps {
+  size?: number
+  color?: string
+  animationSpeed?: number
+}
+
+function AnimatedCuteRobot({
+  size = 240,
+  color = '#00FF00',
+  animationSpeed = 1.8,
+}: AnimatedCuteRobotProps) {
   return (
     <div
-      style={{
-        position: 'absolute',
-        right: '20px',
-        bottom: '80px',
-        width: `${size * 0.15}px`,
-        height: `${size * 0.25}px`,
-        pointerEvents: 'none',
-        zIndex: 50
-      }}
+      className="absolute bottom-0 right-0 md:right-8 md:bottom-6 w-[140px] md:w-[240px] pointer-events-none"
+      style={{ filter: 'drop-shadow(0 0 10px rgba(0,255,0,0.6))' }}
     >
       <motion.svg
-        viewBox="0 0 200 300"
-        style={{
-          width: '100%',
-          height: '100%',
-          filter: 'drop-shadow(0 0 8px rgba(0, 255, 0, 0.6))'
-        }}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        fill="none"
+        width={size}
+        height={size}
         animate={{
           filter: [
-            'drop-shadow(0 0 8px rgba(0, 255, 0, 0.6))',
-            'drop-shadow(0 0 16px rgba(0, 255, 0, 0.8))',
-            'drop-shadow(0 0 8px rgba(0, 255, 0, 0.6))'
-          ]
+            'drop-shadow(0 0 6px rgba(0,255,0,0.5))',
+            'drop-shadow(0 0 12px rgba(0,255,0,0.9))',
+            'drop-shadow(0 0 6px rgba(0,255,0,0.5))',
+          ],
         }}
         transition={{
           duration: animationSpeed,
           repeat: Infinity,
-          ease: 'easeInOut'
+          ease: 'easeInOut',
         }}
       >
-        <defs>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-
-        <motion.g
+        {/* Glow pulse */}
+        <motion.path
+          stroke={color}
+          strokeLinecap="square"
+          strokeWidth={1.667}
+          d="M10 3.333H4.166v7.5h11.667v-7.5H10Zm0 0V1.667m-6.667 12.5 1.25-1.25m12.083 1.25-1.25-1.25M7.5 6.667V7.5m5-.833V7.5M5 10.833V12.5a5 5 0 0 0 10 0v-1.667"
           animate={{
-            opacity: [0.7, 1, 0.7]
+            opacity: [0.7, 1, 0.7],
+            scale: [1, 1.03, 1],
           }}
           transition={{
-            duration: animationSpeed * 0.5,
+            duration: animationSpeed * 1.2,
             repeat: Infinity,
-            ease: 'easeInOut'
+            ease: 'easeInOut',
           }}
-        >
-          {/* Left Antenna */}
-          <line x1="70" y1="20" x2="70" y2="5" stroke={color} strokeWidth="2" />
-          <circle cx="70" cy="5" r="3" stroke={color} strokeWidth="2" fill="none" />
-
-          {/* Right Antenna */}
-          <line x1="130" y1="20" x2="130" y2="5" stroke={color} strokeWidth="2" />
-          <circle cx="130" cy="5" r="3" stroke={color} strokeWidth="2" fill="none" />
-
-          {/* Head - rounded rectangle with grid */}
-          <rect x="60" y="20" width="80" height="50" rx="8" stroke={color} strokeWidth="2.5" fill="none" />
-
-          {/* Head grid lines - vertical */}
-          <line x1="85" y1="20" x2="85" y2="70" stroke={color} strokeWidth="1.5" opacity="0.6" />
-          <line x1="100" y1="20" x2="100" y2="70" stroke={color} strokeWidth="1.5" opacity="0.6" />
-          <line x1="115" y1="20" x2="115" y2="70" stroke={color} strokeWidth="1.5" opacity="0.6" />
-
-          {/* Head grid lines - horizontal */}
-          <line x1="60" y1="37" x2="140" y2="37" stroke={color} strokeWidth="1.5" opacity="0.6" />
-          <line x1="60" y1="53" x2="140" y2="53" stroke={color} strokeWidth="1.5" opacity="0.6" />
-
-          {/* Eye/Sensor - concentric circles with rotation */}
-          <motion.g
-            animate={{
-              rotate: [0, 360]
-            }}
-            transition={{
-              duration: animationSpeed * 2,
-              repeat: Infinity,
-              ease: 'linear'
-            }}
-            style={{ originX: '100px', originY: '45px' }}
-          >
-            <circle cx="100" cy="45" r="12" stroke={color} strokeWidth="2" fill="none" />
-            <circle cx="100" cy="45" r="8" stroke={color} strokeWidth="2" fill="none" />
-            <circle cx="100" cy="45" r="4" stroke={color} strokeWidth="2" fill="none" />
-            <line x1="100" y1="45" x2="112" y2="45" stroke={color} strokeWidth="2" />
-          </motion.g>
-
-          {/* Body - rectangle with grid pattern */}
-          <rect x="70" y="80" width="60" height="90" stroke={color} strokeWidth="2.5" fill="none" />
-
-          {/* Body grid - vertical lines (3 columns, so 2 dividers) */}
-          <line x1="90" y1="80" x2="90" y2="170" stroke={color} strokeWidth="1.5" opacity="0.6" />
-          <line x1="110" y1="80" x2="110" y2="170" stroke={color} strokeWidth="1.5" opacity="0.6" />
-
-          {/* Body grid - horizontal lines (5 rows, so 4 dividers) */}
-          <line x1="70" y1="98" x2="130" y2="98" stroke={color} strokeWidth="1.5" opacity="0.6" />
-          <line x1="70" y1="116" x2="130" y2="116" stroke={color} strokeWidth="1.5" opacity="0.6" />
-          <line x1="70" y1="134" x2="130" y2="134" stroke={color} strokeWidth="1.5" opacity="0.6" />
-          <line x1="70" y1="152" x2="130" y2="152" stroke={color} strokeWidth="1.5" opacity="0.6" />
-
-          {/* Center power indicator */}
-          <circle cx="100" cy="125" r="8" stroke={color} strokeWidth="2" fill="none" opacity="0.8" />
-          <circle cx="100" cy="125" r="4" stroke={color} strokeWidth="2" fill={color} opacity="0.3" />
-
-          {/* Left Leg with bounce animation */}
-          <motion.g
-            animate={{
-              y: [-2, 2, -2]
-            }}
-            transition={{
-              duration: animationSpeed * 0.6,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: 0
-            }}
-          >
-            {/* Upper leg segment */}
-            <line x1="80" y1="170" x2="70" y2="210" stroke={color} strokeWidth="2.5" />
-            <line x1="85" y1="170" x2="75" y2="210" stroke={color} strokeWidth="2.5" />
-            <ellipse cx="82.5" cy="170" rx="5" ry="3" stroke={color} strokeWidth="2" fill="none" />
-
-            {/* Knee joint */}
-            <circle cx="72.5" cy="210" r="5" stroke={color} strokeWidth="2" fill="none" />
-
-            {/* Lower leg segment */}
-            <line x1="70" y1="215" x2="65" y2="255" stroke={color} strokeWidth="2.5" />
-            <line x1="75" y1="215" x2="70" y2="255" stroke={color} strokeWidth="2.5" />
-
-            {/* Foot */}
-            <ellipse cx="67.5" cy="255" rx="8" ry="4" stroke={color} strokeWidth="2.5" fill="none" />
-            <line x1="60" y1="255" x2="75" y2="255" stroke={color} strokeWidth="2.5" />
-          </motion.g>
-
-          {/* Right Leg with bounce animation (opposite phase) */}
-          <motion.g
-            animate={{
-              y: [2, -2, 2]
-            }}
-            transition={{
-              duration: animationSpeed * 0.6,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: 0
-            }}
-          >
-            {/* Upper leg segment */}
-            <line x1="115" y1="170" x2="125" y2="210" stroke={color} strokeWidth="2.5" />
-            <line x1="120" y1="170" x2="130" y2="210" stroke={color} strokeWidth="2.5" />
-            <ellipse cx="117.5" cy="170" rx="5" ry="3" stroke={color} strokeWidth="2" fill="none" />
-
-            {/* Knee joint */}
-            <circle cx="127.5" cy="210" r="5" stroke={color} strokeWidth="2" fill="none" />
-
-            {/* Lower leg segment */}
-            <line x1="125" y1="215" x2="130" y2="255" stroke={color} strokeWidth="2.5" />
-            <line x1="130" y1="215" x2="135" y2="255" stroke={color} strokeWidth="2.5" />
-
-            {/* Foot */}
-            <ellipse cx="132.5" cy="255" rx="8" ry="4" stroke={color} strokeWidth="2.5" fill="none" />
-            <line x1="125" y1="255" x2="140" y2="255" stroke={color} strokeWidth="2.5" />
-          </motion.g>
-
-          {/* Arms */}
-          <line x1="70" y1="95" x2="45" y2="120" stroke={color} strokeWidth="2.5" />
-          <circle cx="45" cy="120" r="4" stroke={color} strokeWidth="2" fill="none" />
-
-          <line x1="130" y1="95" x2="155" y2="120" stroke={color} strokeWidth="2.5" />
-          <circle cx="155" cy="120" r="4" stroke={color} strokeWidth="2" fill="none" />
-        </motion.g>
+        />
+        {/* Eyes flicker */}
+        <motion.circle
+          cx="7.5"
+          cy="7"
+          r="0.4"
+          fill={color}
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 0.8, repeat: Infinity }}
+        />
+        <motion.circle
+          cx="12.5"
+          cy="7"
+          r="0.4"
+          fill={color}
+          animate={{ opacity: [1, 0.3, 1] }}
+          transition={{ duration: 0.8, repeat: Infinity, delay: 0.4 }}
+        />
       </motion.svg>
     </div>
-  );
+  )
+}
+
+// === Main Security Status with Robot ===
+interface SecurityStatusProps {
+  statuses: SecurityStatusType[]
+}
+
+export default function SecurityStatus({ statuses }: SecurityStatusProps) {
+  return (
+    <DashboardCard
+      title="SECURITY STATUS"
+      intent="success"
+      addon={<Badge variant="outline-success">ONLINE</Badge>}
+    >
+      <div className="relative flex flex-col md:flex-row">
+        {/* Status items grid */}
+        <div className="max-md:order-1 grid grid-cols-3 md:grid-cols-1 gap-4 py-2 px-1 md:max-w-max">
+          {statuses.map((item, index) => (
+            <SecurityStatusItem
+              key={index}
+              title={item.title}
+              value={item.value}
+              status={item.status}
+              variant={item.variant}
+            />
+          ))}
+        </div>
+
+        {/* Animated Robot (vector-based, green glowing) */}
+        <AnimatedCuteRobot />
+      </div>
+    </DashboardCard>
+  )
 }
